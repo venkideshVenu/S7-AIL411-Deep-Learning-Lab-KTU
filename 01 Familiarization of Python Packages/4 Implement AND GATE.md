@@ -1,5 +1,5 @@
 
-# **Experiment 4: Implementing a Logical AND Gate**
+# **Experiment 1.4: Implementing a Logical AND Gate**
 
 ### **Aim**
 

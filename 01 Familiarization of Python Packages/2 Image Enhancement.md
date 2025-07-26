@@ -1,4 +1,4 @@
-# **Experiment 2: Image Enhancement and Morphological Operations**
+# **Experiment 1.2: Image Enhancement and Morphological Operations**
 
 ### **Aim**
 
@@ -131,7 +131,7 @@ plt.show()
 
 *This plot shows the result of running the program on the input image.*
 
-![Output Image](../outputs/image_optimization.png)
+![Output Image](../00%20Outputs/image_optimization.png)
 
 -----
 

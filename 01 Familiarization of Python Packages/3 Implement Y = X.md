@@ -1,4 +1,4 @@
-# **Experiment 3: Implementing y = x with a Neural Network**
+# **Experiment 1.3: Implementing y = x with a Neural Network**
 
 ### **Aim**
 

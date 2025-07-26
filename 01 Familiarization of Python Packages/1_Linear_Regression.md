@@ -2,7 +2,7 @@ Of course\! Here is the detailed markdown file for your first experiment on Line
 
 ---
 
-# **Experiment 1: Linear Regression**
+# **Experiment 1.1: Linear Regression**
 
 ### **Aim**
 
@@ -85,7 +85,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
 # Load the dataset
-df = pd.read_csv("../files/data.csv")
+df = pd.read_csv("../00 Inputs/data.csv")
 
 # Define features (X) and target (y)
 X = df.loc[:, 'Height'].values
@@ -132,7 +132,7 @@ Mean Squared Error :  30.863
 
 **Plot**
 
-## ![Linear Regression](../outputs/linear_regression_output.png)
+## ![Linear Regression](../00%20Outputs/linear_regression_output.png)
 
 ### **Code Explanation**
 

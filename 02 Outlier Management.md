@@ -1,4 +1,4 @@
-# **Experiment 5: Data Pre-processing and Outlier Management**
+# **Experiment 02: Data Pre-processing and Outlier Management**
 
 ### **Aim**
 
