@@ -50,7 +50,8 @@ Each experiment is organized into its own directory, containing:
 ├── 📋 05 Digit Classification using CNN.ipynb/.md   # Computer Vision
 ├── 📋 06 Digit Classification using VGGnet-19.ipynb/.md
 ├── 📋 07 Review Classification IMDB.ipynb/.md       # NLP & RNN
-├── 📄 Syllabus.pdf                                 # Course syllabus
+├── � 08 LSTM vs GRU Performance Analysis.ipynb/.md # Advanced RNN
+├── �📄 Syllabus.pdf                                 # Course syllabus
 └── 📄 README.md                                    # This file
 ```
 
@@ -70,7 +71,7 @@ Here is a list of the mandatory experiments completed as part of this lab:
 | **5**    | Digit classification using CNN architecture for MNIST dataset                                            | ✅ **Completed**   | [📓 Notebook](./05%20Digit%20Classification%20using%20CNN.ipynb)                                | [📄 Docs](./05%20Digit%20Classification%20using%20CNN.md)                                |
 | **6**    | Digit classification using pre-trained networks like VGGnet-19 for MNIST dataset                         | ✅ **Completed**   | [📓 Notebook](./06%20Digit%20Classification%20using%20VGGnet-19.ipynb)                          | [📄 Docs](./06%20Digit%20Classification%20using%20VGGnet-19.md)                          |
 | **7**    | Implement a simple RNN for review classification using IMDB dataset                                      | ✅ **Completed**   | [📓 Notebook](./07%20Review%20Classification%20IMDB.ipynb)                                      | [📄 Docs](./07%20Review%20Classification%20IMDB.md)                                      |
-| **8**    | Analyse and visualize the performance change while using LSTM and GRU instead of simple RNN              | 🔄 **In Progress** | -                                                                                               | -                                                                                        |
+| **8**    | Analyse and visualize the performance change while using LSTM and GRU instead of simple RNN              | ✅ **Completed**   | [📓 Notebook](./08%20LSTM%20vs%20GRU%20Performance%20Analysis.ipynb)                            | [📄 Docs](./08%20LSTM%20vs%20GRU%20Performance%20Analysis.md)                            |
 | **9**    | Implement time series forecasting prediction for NIFTY-50 dataset                                        | 🔄 **In Progress** | -                                                                                               | -                                                                                        |
 | **10**   | Implement a shallow auto encoder and decoder network for machine translation                             | 🔄 **In Progress** | -                                                                                               | -                                                                                        |
 

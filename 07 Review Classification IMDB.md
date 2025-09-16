@@ -80,10 +80,11 @@ from keras.datasets import imdb
 import tensorflow as tf
 from keras import layers, models, Sequential
 from keras.preprocessing import sequence
+import numpy as np
 
 # ----------------------------- Set Hyperparameters -----------------------------
-max_features = 5000      # Vocabulary size
-max_words = 500          # Max sequence length after padding
+max_features = 5000         # Vocabulary size
+max_words = 500             # Max sequence length after padding
 
 # ----------------------------- Load and Preprocess the Dataset -----------------------------
 (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=max_features)
@@ -97,11 +98,10 @@ print('Test data shape:', X_test.shape)
 
 # ----------------------------- Build the Model -----------------------------
 model = models.Sequential()
-model.add(layers.Embedding(input_dim=max_features, output_dim=32, input_length=max_words))
-model.add(layers.SimpleRNN(100)) # 100 RNN units in the hidden layer
+model.add(layers.Embedding(max_features, 32))
+model.add(layers.SimpleRNN(100))
 model.add(layers.Dense(1, activation='sigmoid'))
-
-# ----------------------------- Model Summary -----------------------------
+model.build(input_shape=(None, max_words))
 model.summary()
 
 # ----------------------------- Compile the Model -----------------------------
@@ -116,9 +116,19 @@ history = model.fit(X_train, y_train,
                     validation_split=0.2)
 
 # ----------------------------- Evaluate the Model -----------------------------
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f'\nTest Loss: {loss:.4f}')
-print(f'Test Accuracy: {accuracy:.4f}')
+loss, acc = model.evaluate(X_test, y_test)
+print("Test accuracy:", round(acc*100, 4))
+
+# ----------------------------- Prediction Example -----------------------------
+test_seq = np.reshape(X_test[7], (1, -1))   # Use X_test instead of undefined 'xte'
+pred = model.predict(test_seq)[0][0]        # Prediction value
+
+if pred >= 0.5:
+    print("Positive Review")
+else:
+    print("Negative Review")
+
+print("Actual Label:", "Positive" if y_test[7] == 1 else "Negative")
 ```
 
 ---
@@ -137,42 +147,69 @@ Test data shape: (25000, 500)
 **Model Summary**
 
 ```
-Model: "sequential"
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
-┃ Layer (type)                         ┃ Output Shape                ┃         Param # ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
-│ embedding (Embedding)                │ (None, 500, 32)             │         160,000 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ simple_rnn (SimpleRNN)               │ (None, 100)                 │          13,300 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ dense (Dense)                        │ (None, 1)                   │             101 │
-└──────────────────────────────────────┴─────────────────────────────┴─────────────────┘
+Model: "sequential_1"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ embedding_1 (Embedding)         │ (None, 500, 32)        │       160,000 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ simple_rnn_1 (SimpleRNN)        │ (None, 100)            │        13,300 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 1)              │           101 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
  Total params: 173,401 (677.35 KB)
  Trainable params: 173,401 (677.35 KB)
  Non-trainable params: 0 (0.00 B)
 ```
 
-**Training Log (abbreviated)**
+**Training Log**
 
 ```
 Epoch 1/15
-313/313 ━━━━━━━━━━━━━━━━━━━━ 96s 288ms/step - accuracy: 0.5099 - loss: 0.6949 - val_accuracy: 0.5916 - val_loss: 0.6754
+313/313 ━━━━━━━━━━━━━━━━━━━━ 18s 45ms/step - accuracy: 0.5082 - loss: 0.6961 - val_accuracy: 0.5922 - val_loss: 0.6727
 Epoch 2/15
-313/313 ━━━━━━━━━━━━━━━━━━━━ 90s 288ms/step - accuracy: 0.6434 - loss: 0.6377 - val_accuracy: 0.6464 - val_loss: 0.6155
-...
+313/313 ━━━━━━━━━━━━━━━━━━━━ 17s 38ms/step - accuracy: 0.6452 - loss: 0.6445 - val_accuracy: 0.6452 - val_loss: 0.6218
+Epoch 3/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 12s 40ms/step - accuracy: 0.7368 - loss: 0.5203 - val_accuracy: 0.6912 - val_loss: 0.6227
+Epoch 4/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 21s 40ms/step - accuracy: 0.7250 - loss: 0.5373 - val_accuracy: 0.6492 - val_loss: 0.6193
+Epoch 5/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 20s 39ms/step - accuracy: 0.7588 - loss: 0.4929 - val_accuracy: 0.7224 - val_loss: 0.5690
+Epoch 6/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 20s 39ms/step - accuracy: 0.8077 - loss: 0.4279 - val_accuracy: 0.7466 - val_loss: 0.5833
+Epoch 7/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 20s 39ms/step - accuracy: 0.8373 - loss: 0.3777 - val_accuracy: 0.7384 - val_loss: 0.6258
+Epoch 8/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 21s 40ms/step - accuracy: 0.8258 - loss: 0.3871 - val_accuracy: 0.7340 - val_loss: 0.6016
+Epoch 9/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 20s 39ms/step - accuracy: 0.7309 - loss: 0.5115 - val_accuracy: 0.6084 - val_loss: 0.6772
+Epoch 10/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 21s 40ms/step - accuracy: 0.6725 - loss: 0.5813 - val_accuracy: 0.6178 - val_loss: 0.6580
+Epoch 11/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 21s 40ms/step - accuracy: 0.7080 - loss: 0.5376 - val_accuracy: 0.6394 - val_loss: 0.6603
+Epoch 12/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 12s 38ms/step - accuracy: 0.7427 - loss: 0.4920 - val_accuracy: 0.6650 - val_loss: 0.6818
+Epoch 13/15
+313/313 ━━━━━━━━━━━━━━━━━━━━ 12s 39ms/step - accuracy: 0.8009 - loss: 0.4227 - val_accuracy: 0.7094 - val_loss: 0.6462
 Epoch 14/15
-313/313 ━━━━━━━━━━━━━━━━━━━━ 108s 345ms/step - accuracy: 0.9087 - loss: 0.2459 - val_accuracy: 0.7848 - val_loss: 0.5786
+313/313 ━━━━━━━━━━━━━━━━━━━━ 12s 38ms/step - accuracy: 0.8511 - loss: 0.3447 - val_accuracy: 0.7278 - val_loss: 0.6086
 Epoch 15/15
-313/313 ━━━━━━━━━━━━━━━━━━━━ 111s 356ms/step - accuracy: 0.9039 - loss: 0.2502 - val_accuracy: 0.7372 - val_loss: 0.6312
+313/313 ━━━━━━━━━━━━━━━━━━━━ 21s 39ms/step - accuracy: 0.8797 - loss: 0.3008 - val_accuracy: 0.7238 - val_loss: 0.6231
 ```
 
-**Final Evaluation**
+**Model Evaluation**
 
 ```
-782/782 ━━━━━━━━━━━━━━━━━━━━ 66s 84ms/step - accuracy: 0.7360 - loss: 0.6208
+782/782 ━━━━━━━━━━━━━━━━━━━━ 8s 10ms/step - accuracy: 0.7293 - loss: 0.6142
+Test accuracy: 73.42
+```
 
-Test Loss: 0.6132
-Test Accuracy: 0.7378
+**Prediction Example**
+
+```
+1/1 ━━━━━━━━━━━━━━━━━━━━ 1s 586ms/step
+Negative Review
+Actual Label: Negative
 ```
 
 ---
@@ -180,19 +217,22 @@ Test Accuracy: 0.7378
 ### **Code Explanation**
 
 1.  **Data Loading**: `imdb.load_data()` conveniently loads the dataset, already converted into integer sequences. `num_words=max_features` limits the vocabulary size.
-2.  **Padding**: `sequence.pad_sequences()` is used to ensure all review sequences have the same length (`max_len=500`), which is required for batch processing in the RNN.
+2.  **Padding**: `sequence.pad_sequences()` is used to ensure all review sequences have the same length (`maxlen=500`), which is required for batch processing in the RNN.
 3.  **Model Building**:
     - `Embedding`: Creates the lookup table to map the 5,000 unique words to 32-dimensional vectors.
     - `SimpleRNN`: This is the core recurrent layer with 100 internal units (neurons) that process the sequence of word embeddings.
     - `Dense`: A final fully connected layer with a single neuron and `sigmoid` activation produces the final probability score (0 to 1) for the review being positive.
-4.  **Compilation**: The model is compiled with `adam` (a common and effective optimizer), `binary_crossentropy` (the standard loss for two-class problems), and `accuracy` as the metric.
-5.  **Training**: The model is trained for 15 epochs. `validation_split=0.2` reserves 20% of the training data to monitor performance on data not used for training updates, which helps in identifying overfitting.
+4.  **Model Building**: The model is explicitly built using `model.build()` with the specified input shape before showing the summary.
+5.  **Compilation**: The model is compiled with `adam` (a common and effective optimizer), `binary_crossentropy` (the standard loss for two-class problems), and `accuracy` as the metric.
+6.  **Training**: The model is trained for 15 epochs. `validation_split=0.2` reserves 20% of the training data to monitor performance on data not used for training updates, which helps in identifying overfitting.
+7.  **Evaluation**: The model is evaluated on the test set, and the accuracy is displayed as a percentage.
+8.  **Prediction Example**: A single test sample is used to demonstrate how the model makes predictions, showing both the predicted sentiment and the actual label.
 
 ---
 
 ### **Result**
 
-The simple RNN model was successfully trained for 15 epochs and achieved a final test accuracy of approximately **73.8%**. The training accuracy reached over 90% in the later epochs, while the validation accuracy peaked around 78% and then fluctuated, showing a significant gap between the two.
+The simple RNN model was successfully trained for 15 epochs and achieved a final test accuracy of approximately **73.42%**. The model demonstrates its ability to learn sentiment patterns from movie reviews, with training accuracy reaching nearly 88% in the final epoch, while validation accuracy peaked around 74% and showed some fluctuation.
 
 ### **Inference**
 
