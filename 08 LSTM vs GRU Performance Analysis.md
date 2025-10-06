@@ -71,12 +71,10 @@ To compare and analyze the performance of **LSTM (Long Short-Term Memory)** and 
 ```python
 # Experiment 08: Analyze and Visualize the Performance of LSTM vs GRU
 
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense, GRU
+from keras.datasets import imdb
+from keras.preprocessing.sequence import pad_sequences
+from keras.models import Sequential
+from keras.layers import Embedding, LSTM, Dense, GRU
 import matplotlib.pyplot as plt
 
 # ----------------------------- Hyperparameters -----------------------------

@@ -7,7 +7,7 @@ To implement, train, and evaluate a Feed-Forward Neural Network (FFNN) with thre
 ### **Algorithm**
 
 1.  **Start**
-2.  Import necessary libraries: `tensorflow`, `numpy`, and `matplotlib`.
+2.  Import necessary libraries: `keras`, and `matplotlib`.
 3.  Load the CIFAR-10 dataset, which is split into training and testing sets (`xtr`, `ytr`, `xte`, `yte`).
 4.  Pre-process the data:
       - Normalize the pixel values of the images to the `[0, 1]` range.
@@ -65,12 +65,10 @@ An FFNN, or Multi-Layer Perceptron (MLP), is a classic neural network where conn
 ### **Code**
 
 ```python
-import tensorflow as tf
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.utils import to_categorical
-import numpy as np
+from keras import layers
+from keras.models import Sequential
+from keras.datasets import cifar10
+from keras.utils import to_categorical
 import matplotlib.pyplot as plt
 
 # ----------------------------- Load and Normalize the Data -----------------------------
@@ -98,7 +96,7 @@ model.compile(
 history = model.fit(xtr, ytr, epochs=5, batch_size=64, validation_data=(xte, yte))
 
 # ----------------------------- Evaluate the Model -----------------------------
-_, acc = model.evaluate(xte, yte, verbose=0)
+_, acc = model.evaluate(xte, yte)
 print("Test accuracy:", round(acc * 100, 4), "%")
 
 # ----------------------------- Predict and Visualize -----------------------------

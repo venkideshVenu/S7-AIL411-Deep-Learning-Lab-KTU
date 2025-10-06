@@ -145,7 +145,6 @@ model4 = models.Sequential([
     layers.Flatten(input_shape=(32, 32, 3)),
     layers.Dense(256, activation='relu'),
     layers.BatchNormalization(),
-    layers.Activation('relu'),
     layers.Dense(10, activation='softmax')
 ])
 
@@ -424,32 +423,7 @@ L1L2 Score: [2.145805597305298, 0.49950000643730164]
 
 ---
 
-```
-Training shape: (50000, 32, 32, 3)
 
-Model: "sequential_1"
-Total params: 855,050 (3.26 MB)
-Trainable params: 855,050 (3.26 MB)
-Non-trainable params: 0 (0.00 B)
-
-Epoch 1/15 - accuracy: 0.2692 - loss: 1.9886 - val_accuracy: 0.3450 - val_loss: 1.7848
-...
-Epoch 15/15 - accuracy: 0.5008 - loss: 1.3828 - val_accuracy: 0.4641 - val_loss: 1.5264
-313/313 - accuracy: 0.4667 - loss: 1.4948
-Xavier Score: [1.5038, 0.4642]
-
-Model: "sequential_2"  (Xavier Init)
-Total params: 820,874 (3.13 MB)
-Trainable params: 820,874 (3.13 MB)
-Non-trainable params: 0 (0.00 B)
-
-Epoch 1/15 - accuracy: 0.2681 - loss: 1.9995 - val_accuracy: 0.3368 - val_loss: 1.7978
-...
-Epoch 15/15 - accuracy: 0.4891 - loss: 1.4300 - val_accuracy: 0.4380 - val_loss: 1.6010
-79/79 - accuracy: 0.4439 - loss: 1.5619
-Kaiming Score: [1.5825, 0.4401]
-
-Model: "sequential_3"  (Dropout)
 ### **Code Explanation**
 
 1.  **Data Setup**: The CIFAR-10 dataset is loaded and pre-processed by normalizing the image data to [0,1] range and one-hot encoding the labels for multi-class classification.
