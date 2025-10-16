@@ -127,7 +127,20 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 import re
 
-# ----------------------------- Load and Prepare Data -----------------------------
+print("TensorFlow version:", tf.__version__)
+
+# ============================================================================
+# 1. LOAD AND PREPARE DATASET
+# ============================================================================
+print("\n" + "="*70)
+print("LOADING KAGGLE ENGLISH-HINDI TRANSLATION DATASET")
+print("="*70)
+
+# For demonstration, we'll create a sample dataset
+# To use the actual Kaggle dataset, download it and load using:
+# df = pd.read_csv('Hindi_English_Truncated_Corpus.csv')
+
+# Sample English-Hindi pairs (replace with actual Kaggle dataset)
 data = {
     'english_sentence': [
         'hello', 'how are you', 'good morning', 'thank you', 'goodbye',
@@ -152,115 +165,297 @@ data = {
         'यह क्या है', 'आप कहां रहते हैं', 'मैं जाना चाहता हूं'
     ]
 }
+
 df = pd.DataFrame(data)
+print(f"Dataset loaded with {len(df)} sentence pairs")
+print("\nSample data:")
+print(df.head())
+
+# ============================================================================
+# 2. PREPROCESSING
+# ============================================================================
+print("\n" + "="*70)
+print("PREPROCESSING DATA")
+print("="*70)
 
 def preprocess_sentence(sentence):
+    """Clean and preprocess sentences"""
     sentence = sentence.lower().strip()
+    # Add space between punctuation
     sentence = re.sub(r"([?.!,¿])", r" \1 ", sentence)
     sentence = re.sub(r'[" "]+', " ", sentence)
-    return sentence.strip()
+    sentence = sentence.strip()
+    return sentence
 
+# Preprocess English sentences
 df['english_sentence'] = df['english_sentence'].apply(preprocess_sentence)
+
+# Add start and end tokens to Hindi sentences
 df['hindi_sentence'] = df['hindi_sentence'].apply(lambda x: '<start> ' + x + ' <end>')
 
 english_sentences = df['english_sentence'].tolist()
 hindi_sentences = df['hindi_sentence'].tolist()
 
-# ----------------------------- Tokenization -----------------------------
+print(f"Total sentences: {len(english_sentences)}")
+
+# ============================================================================
+# 3. TOKENIZATION AND VOCABULARY
+# ============================================================================
+print("\n" + "="*70)
+print("TOKENIZATION AND VOCABULARY BUILDING")
+print("="*70)
+
+# Create tokenizers
 eng_tokenizer = Tokenizer(filters='', oov_token='<OOV>')
 eng_tokenizer.fit_on_texts(english_sentences)
+
 hin_tokenizer = Tokenizer(filters='', oov_token='<OOV>')
 hin_tokenizer.fit_on_texts(hindi_sentences)
 
+# Vocabulary sizes
 eng_vocab_size = len(eng_tokenizer.word_index) + 1
 hin_vocab_size = len(hin_tokenizer.word_index) + 1
 
+print(f"English vocabulary size: {eng_vocab_size}")
+print(f"Hindi vocabulary size: {hin_vocab_size}")
+
+# Convert to sequences
 eng_sequences = eng_tokenizer.texts_to_sequences(english_sentences)
 hin_sequences = hin_tokenizer.texts_to_sequences(hindi_sentences)
 
-max_len = 10
-eng_padded = pad_sequences(eng_sequences, maxlen=max_len, padding='post')
-hin_padded = pad_sequences(hin_sequences, maxlen=max_len, padding='post')
+# Pad sequences
+max_eng_len = 15
+max_hin_len = 15
 
+eng_padded = pad_sequences(eng_sequences, maxlen=max_eng_len, padding='post')
+hin_padded = pad_sequences(hin_sequences, maxlen=max_hin_len, padding='post')
+
+print(f"English padded shape: {eng_padded.shape}")
+print(f"Hindi padded shape: {hin_padded.shape}")
+
+# Prepare decoder input and target
 decoder_input = hin_padded[:, :-1]
 decoder_target = hin_padded[:, 1:]
 
-# ----------------------------- Build Model -----------------------------
-embedding_dim = 64
-latent_dim = 128
+print(f"Decoder input shape: {decoder_input.shape}")
+print(f"Decoder target shape: {decoder_target.shape}")
 
-encoder_inputs = layers.Input(shape=(max_len,))
-encoder_embedding = layers.Embedding(eng_vocab_size, embedding_dim, mask_zero=True)(encoder_inputs)
-encoder_outputs, state_h, state_c = layers.LSTM(latent_dim, return_state=True)(encoder_embedding)
+# ============================================================================
+# 4. BUILD SHALLOW AUTOENCODER MODEL
+# ============================================================================
+print("\n" + "="*70)
+print("BUILDING SHALLOW AUTOENCODER-DECODER MODEL")
+print("="*70)
+
+# Model hyperparameters
+embedding_dim = 128
+latent_dim = 256
+
+# ENCODER
+encoder_inputs = layers.Input(shape=(max_eng_len,), name='encoder_input')
+encoder_embedding = layers.Embedding(
+    eng_vocab_size, 
+    embedding_dim, 
+    mask_zero=True,
+    name='encoder_embedding'
+)(encoder_inputs)
+
+# Shallow encoder - single LSTM layer
+encoder_lstm = layers.LSTM(
+    latent_dim, 
+    return_state=True,
+    name='encoder_lstm'
+)
+encoder_outputs, state_h, state_c = encoder_lstm(encoder_embedding)
 encoder_states = [state_h, state_c]
 
-decoder_inputs = layers.Input(shape=(max_len-1,))
-decoder_embedding = layers.Embedding(hin_vocab_size, embedding_dim, mask_zero=True)(decoder_inputs)
-decoder_lstm = layers.LSTM(latent_dim, return_sequences=True, return_state=True)
-decoder_outputs, _, _ = decoder_lstm(decoder_embedding, initial_state=encoder_states)
-decoder_dense = layers.Dense(hin_vocab_size, activation='softmax')
+print("Encoder built successfully")
+
+# DECODER
+decoder_inputs = layers.Input(shape=(max_hin_len - 1,), name='decoder_input')
+decoder_embedding = layers.Embedding(
+    hin_vocab_size, 
+    embedding_dim, 
+    mask_zero=True,
+    name='decoder_embedding'
+)(decoder_inputs)
+
+# Shallow decoder - single LSTM layer
+decoder_lstm = layers.LSTM(
+    latent_dim, 
+    return_sequences=True, 
+    return_state=True,
+    name='decoder_lstm'
+)
+decoder_outputs, _, _ = decoder_lstm(
+    decoder_embedding, 
+    initial_state=encoder_states
+)
+
+# Output layer
+decoder_dense = layers.Dense(
+    hin_vocab_size, 
+    activation='softmax',
+    name='decoder_dense'
+)
 decoder_outputs = decoder_dense(decoder_outputs)
 
+print("Decoder built successfully")
+
+# Complete model
 model = keras.Model([encoder_inputs, decoder_inputs], decoder_outputs)
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+print("\nModel Architecture:")
 model.summary()
 
-# ----------------------------- Train Model -----------------------------
+# ============================================================================
+# 5. TRAIN THE MODEL
+# ============================================================================
+print("\n" + "="*70)
+print("TRAINING THE MODEL")
+print("="*70)
+
+# Split data
 X_train_enc, X_test_enc, X_train_dec, X_test_dec, y_train, y_test = train_test_split(
-    eng_padded, decoder_input, decoder_target, test_size=0.2, random_state=42
+    eng_padded, decoder_input, decoder_target, 
+    test_size=0.2, random_state=42
 )
 
-model.fit(
+print(f"Training samples: {len(X_train_enc)}")
+print(f"Testing samples: {len(X_test_enc)}")
+
+# Train model
+history = model.fit(
     [X_train_enc, X_train_dec],
     np.expand_dims(y_train, -1),
-    batch_size=2,
-    epochs=50,
-    validation_data=([X_test_enc, X_test_dec], np.expand_dims(y_test, -1))
+    batch_size=4,
+    epochs=100,
+    validation_data=([X_test_enc, X_test_dec], np.expand_dims(y_test, -1)),
+    verbose=1
 )
 
-# ----------------------------- Inference -----------------------------
+print(f"\nTraining completed!")
+print(f"Final training loss: {history.history['loss'][-1]:.4f}")
+print(f"Final training accuracy: {history.history['accuracy'][-1]:.4f}")
+print(f"Final validation loss: {history.history['val_loss'][-1]:.4f}")
+print(f"Final validation accuracy: {history.history['val_accuracy'][-1]:.4f}")
+
+# ============================================================================
+# 6. BUILD INFERENCE MODELS
+# ============================================================================
+print("\n" + "="*70)
+print("BUILDING INFERENCE MODELS")
+print("="*70)
+
+# Encoder inference model
 encoder_model = keras.Model(encoder_inputs, encoder_states)
+
+# Decoder inference model
 decoder_state_input_h = layers.Input(shape=(latent_dim,))
 decoder_state_input_c = layers.Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
-decoder_embedding_layer = model.layers[3]
-decoder_lstm_layer = model.layers[4]
-decoder_dense_layer = model.layers[5]
+
+decoder_embedding_inf = model.get_layer('decoder_embedding')
+decoder_lstm_inf = model.get_layer('decoder_lstm')
+decoder_dense_inf = model.get_layer('decoder_dense')
 
 decoder_inputs_single = layers.Input(shape=(1,))
-decoder_embeddings = decoder_embedding_layer(decoder_inputs_single)
-decoder_outputs, state_h, state_c = decoder_lstm_layer(decoder_embeddings, initial_state=decoder_states_inputs)
-decoder_outputs = decoder_dense_layer(decoder_outputs)
-decoder_model = keras.Model([decoder_inputs_single] + decoder_states_inputs, [decoder_outputs, state_h, state_c])
+decoder_embedding_output = decoder_embedding_inf(decoder_inputs_single)
+decoder_outputs, state_h, state_c = decoder_lstm_inf(
+    decoder_embedding_output, 
+    initial_state=decoder_states_inputs
+)
+decoder_states = [state_h, state_c]
+decoder_outputs = decoder_dense_inf(decoder_outputs)
 
-def translate_sentence(sentence):
-    sentence = preprocess_sentence(sentence)
-    input_seq = eng_tokenizer.texts_to_sequences([sentence])
-    input_seq = pad_sequences(input_seq, maxlen=max_len, padding='post')
+decoder_model = keras.Model(
+    [decoder_inputs_single] + decoder_states_inputs,
+    [decoder_outputs] + decoder_states
+)
+
+print("Inference models created successfully")
+
+# ============================================================================
+# 7. TRANSLATION FUNCTION
+# ============================================================================
+
+def translate_sentence(input_sentence):
+    """Translate English sentence to Hindi"""
+    # Preprocess input
+    input_sentence = preprocess_sentence(input_sentence)
+    
+    # Encode input
+    input_seq = eng_tokenizer.texts_to_sequences([input_sentence])
+    input_seq = pad_sequences(input_seq, maxlen=max_eng_len, padding='post')
+    
+    # Get encoder states
     states_value = encoder_model.predict(input_seq, verbose=0)
+    
+    # Generate empty target sequence
     target_seq = np.zeros((1, 1))
-    target_seq[0, 0] = hin_tokenizer.word_index['<start>']
+    target_seq[0, 0] = hin_tokenizer.word_index.get('<start>', 1)
+    
+    # Decode
     stop_condition = False
     decoded_sentence = []
+    
     while not stop_condition:
-        output_tokens, h, c = decoder_model.predict([target_seq] + states_value, verbose=0)
+        output_tokens, h, c = decoder_model.predict(
+            [target_seq] + states_value, 
+            verbose=0
+        )
+        
+        # Sample token
         sampled_token_index = np.argmax(output_tokens[0, -1, :])
+        
+        # Get word
         sampled_word = None
         for word, index in hin_tokenizer.word_index.items():
-            if index == sampled_token_index:
+            if sampled_token_index == index:
                 sampled_word = word
                 break
-        if sampled_word == '<end>' or len(decoded_sentence) > max_len:
+        
+        if sampled_word == '<end>' or len(decoded_sentence) > max_hin_len:
             stop_condition = True
-        elif sampled_word != '<start>':
+        elif sampled_word and sampled_word != '<start>':
             decoded_sentence.append(sampled_word)
+        
+        # Update target sequence
         target_seq = np.zeros((1, 1))
         target_seq[0, 0] = sampled_token_index
+        
+        # Update states
         states_value = [h, c]
+    
     return ' '.join(decoded_sentence)
 
-print("\nEnglish: how are you")
-print("Hindi Translation:", translate_sentence("how are you"))
+# ============================================================================
+# 8. INTERACTIVE TRANSLATION
+# ============================================================================
+print("\n" + "="*70)
+print("INTERACTIVE TRANSLATION MODE")
+print("="*70)
+print("Enter English sentences to translate (type 'quit' to exit)")
+
+while True:
+    user_input = input("\nEnglish: ")
+    if user_input.lower() == 'quit':
+        break
+    
+    try:
+        translation = translate_sentence(user_input)
+        print(f"Hindi:   {translation}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+print("\nTranslation session ended.")
+print("="*70)
 ```
 
 ---

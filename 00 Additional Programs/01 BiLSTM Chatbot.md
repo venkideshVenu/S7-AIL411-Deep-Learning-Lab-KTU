@@ -116,14 +116,14 @@ import torch.optim as optim
 from nltk.tokenize import word_tokenize
 import nltk
 
-# Download tokenizers
+# Download necessary tokenizers
 nltk.download('punkt_tab')
 nltk.download('punkt')
 
 print("✅ PyTorch installed! Version:", torch.__version__)
 
 # ===============================================
-# Step 1: Define training pairs
+# Step 1: Define training pairs (simple chatbot dataset)
 # ===============================================
 pairs = [
     ("hi", "hello"),
@@ -139,7 +139,7 @@ pairs = [
 ]
 
 # ===============================================
-# Step 2: Tokenization and Vocabulary
+# Step 2: Tokenization and Vocabulary Creation
 # ===============================================
 tokens = set()
 for q, a in pairs:
@@ -148,21 +148,30 @@ for q, a in pairs:
 
 tokens = sorted(list(tokens))
 
+# Create word-index mappings
 word2idx = {word: idx + 1 for idx, word in enumerate(tokens)}
 word2idx["<pad>"] = 0
 word2idx["<eos>"] = len(word2idx)
+
+# Reverse mapping
 idx2word = {idx: word for word, idx in word2idx.items()}
+
 vocab_size = len(word2idx)
-max_len = 6
+max_len = 6  # Maximum sequence length (for padding)
 
 # ===============================================
 # Step 3: Sentence Encoding Function
 # ===============================================
 def encode(sentence):
+    """
+    Tokenizes a sentence, adds an end-of-sentence token,
+    converts tokens to indices, and pads to max_len.
+    """
     tokens = word_tokenize(sentence.lower()) + ["<eos>"]
     idxs = [word2idx.get(token, 0) for token in tokens]
     return idxs + [0] * (max_len - len(idxs))
 
+# Encode all input and output pairs
 X = torch.tensor([encode(q) for q, a in pairs])
 Y = torch.tensor([encode(a) for q, a in pairs])
 
@@ -178,12 +187,24 @@ class BiLSTMChatbot(nn.Module):
         self.fc = nn.Linear(hidden_size * 2, vocab_size)
 
     def forward(self, x):
+        """
+        Forward pass of the chatbot model.
+        1. Encode the input sequence using a BiLSTM.
+        2. Concatenate forward and backward hidden states.
+        3. Decode using another LSTM.
+        4. Predict token probabilities for each time step.
+        """
         embedded = self.embedding(x)
         _, (hidden, _) = self.encoder(embedded)
+
+        # Merge forward and backward hidden states
         h_cat = torch.cat((hidden[0], hidden[1]), dim=1).unsqueeze(0)
         c_cat = torch.zeros_like(h_cat)
+
+        # Teacher forcing: use input as decoder input
         dec_in = self.embedding(x)
         out, _ = self.decoder(dec_in, (h_cat, c_cat))
+
         return self.fc(out)
 
 # ===============================================
@@ -193,6 +214,7 @@ model = BiLSTMChatbot(vocab_size, embed_size=64, hidden_size=64)
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 criterion = nn.CrossEntropyLoss(ignore_index=0)
 
+# Training loop
 for epoch in range(100):
     model.train()
     optimizer.zero_grad()
@@ -200,18 +222,23 @@ for epoch in range(100):
     loss = criterion(output.view(-1, vocab_size), Y.view(-1))
     loss.backward()
     optimizer.step()
+
     if epoch % 10 == 0:
         print(f"Epoch {epoch} - Loss: {loss.item():.4f}")
 
 # ===============================================
-# Step 6: Chat Function
+# Step 6: Chat Function for Testing
 # ===============================================
 def chat(user_input):
+    """
+    Generates a chatbot response for a given user input.
+    """
     model.eval()
     x = torch.tensor([encode(user_input)])
     with torch.no_grad():
         out = model(x)
         preds = out.argmax(2).squeeze()
+
         words = []
         for idx in preds:
             word = idx2word.get(idx.item(), "")
@@ -220,28 +247,6 @@ def chat(user_input):
             if idx.item() != 0:
                 words.append(word)
         return " ".join(words)
-
-# ===============================================
-# Step 7: Interactive Chat Mode
-# ===============================================
-print("\n" + "="*70)
-print("INTERACTIVE CHAT MODE")
-print("="*70)
-print("Type a message to chat with the bot (type 'quit' to exit)")
-
-while True:
-    user_input = input("\nYou: ")
-    if user_input.lower() in ['quit', 'exit', 'bye']:
-        print("Bot: Goodbye!")
-        break
-    try:
-        response = chat(user_input)
-        print(f"Bot: {response}")
-    except Exception as e:
-        print(f" Error: {e}")
-
-print("\nChat session ended.")
-print("="*70)
 ```
 
 ---

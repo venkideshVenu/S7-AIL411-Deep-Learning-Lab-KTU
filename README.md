@@ -29,18 +29,7 @@ Each experiment is organized into its own directory, containing:
 ├── 📁 00 Additional Programs/                       # Extra experiments and advanced implementations
 │   └── 01 BiLSTM Chatbot.ipynb/.md
 ├── 📁 00 Inputs/                                    # Input data files
-│   ├── clock.png
-│   └── data.csv
 ├── 📁 00 Outputs/                                   # Generated output images
-│   ├── digitClassificationCNN.png
-│   ├── digitClassificationVGGnet-19.png
-│   ├── digits.png
-│   ├── feedForwardNetwork.png
-│   ├── GrayImg.jpg
-│   ├── HistogramEqualization.jpg
-│   ├── image_optimization.png
-│   ├── linear_regression_output.png
-│   └── MorphologicalOperation.jpg
 ├── 📁 01 Familiarization of Python Packages/       # Basic Python & ML experiments
 │   ├── 1_Linear_Regression.ipynb/.md
 │   ├── 2 Image Enhancement.ipynb/.md

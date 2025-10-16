@@ -88,69 +88,107 @@ This makes LSTMs ideal for financial time series forecasting.
 ### **Code**
 
 ```python
-# ----------------------------- Import Libraries -----------------------------
-
+# Import necessary libraries
 import pandas as pd
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, LSTM
+from keras.layers import Dense, SimpleRNN
+from keras import layers
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.preprocessing.sequence import TimeseriesGenerator
 import matplotlib.pyplot as plt
 
-# ----------------------------- Load and Inspect Data -----------------------------
+# ==============================
+# Load and inspect the dataset
+# ==============================
 
-# Load dataset with 'Date' as index
+# Load the NIFTY dataset (assumed to have a 'Date' column)
+# 'Date' is set as the index and parsed as datetime objects
 data = pd.read_csv('./00 inputs/nifty.csv', index_col='Date', parse_dates=True)
 
-# Select relevant features
+# Select only relevant columns for modeling
 new_df = data[['Open', 'High', 'Low', 'Price']]
-print(new_df.head())
+new_df.head()  # Check the selected columns
 
-# ----------------------------- Data Normalization -----------------------------
+# ==============================
+# Data normalization
+# ==============================
 
+# Scale the features to a 0-1 range for better neural network performance
 scaler = MinMaxScaler(feature_range=(0, 1))
 data_scaled = scaler.fit_transform(new_df)
+data_scaled  # This is now a NumPy array of scaled values
 
-# ----------------------------- Train-Test Split -----------------------------
+# ==============================
+# Split data into train and test sets
+# ==============================
 
+# Use 80% of the data for training and 20% for testing
 n = int(len(data_scaled) * 0.8)
 train_data = data_scaled[:n]
 test_data = data_scaled[n:]
 
-# ----------------------------- Time Series Generation -----------------------------
+# ==============================
+# Define parameters for time series generation
+# ==============================
 
-n_input = 3       # number of time steps
-n_features = 4    # number of features
+n_input = 3       # Number of time steps used to predict the next step
+n_features = 4    # Number of features ('Open', 'High', 'Low', 'Price')
 
+# Create time series generators for training and testing
+# These automatically create input-output pairs for time series modeling
 generator_train = TimeseriesGenerator(train_data, train_data, length=n_input)
 generator_test = TimeseriesGenerator(test_data, test_data, length=n_input)
 
-# ----------------------------- Build RNN Model (LSTM) -----------------------------
+# Check the first batch of training data
+generator_train[0]
+
+# ==============================
+# Build the RNN model (LSTM)
+# ==============================
 
 model = Sequential()
-model.add(LSTM(100, activation='relu'))
+
+# Add an LSTM layer with 100 units and ReLU activation
+# (You imported SimpleRNN but used LSTM here — that’s fine)
+model.add(layers.LSTM(100, activation='relu'))
+
+# Add a Dense output layer with 4 units (one for each feature)
 model.add(Dense(4))
 
-model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
-print(model.summary())
+# Compile the model with Adam optimizer and mean squared error loss
+model.compile(optimizer='adam',
+              loss='mean_squared_error',
+              metrics=['accuracy'])
 
-# ----------------------------- Train the Model -----------------------------
+# ==============================
+# Train the model
+# ==============================
 
+# Fit the model on the training data for 50 epochs
 model.fit(generator_train, epochs=50)
 
-# ----------------------------- Evaluate Model -----------------------------
+# Display the model architecture summary
+print(model.summary())
 
+
+# Evaluate model performance on the test dataset
 model.evaluate(generator_test)
 
-# Generate Predictions
+# Generate predictions for the test set
 predictions = model.predict(generator_test)
+predictions  # Display the predicted values (scaled)
 
-# Inverse transform predictions and actual data
+# Convert scaled predictions and actual test data back to original values
 predictions_original = scaler.inverse_transform(predictions)
 test_data_original = scaler.inverse_transform(test_data[n_input:])
 
-# ----------------------------- Plot Actual vs Predicted -----------------------------
+# Display both original test data and predictions
+test_data_original, predictions_original
+
+# ==============================
+# Plot overall actual vs predicted values
+# ==============================
 
 plt.figure(figsize=(15, 6))
 plt.plot(data.index[n + n_input:], test_data_original, label='Actual Prices', color='blue')
@@ -161,17 +199,25 @@ plt.ylabel('Stock Price (Close)')
 plt.legend()
 plt.show()
 
-# ----------------------------- Plot Each Feature Separately -----------------------------
+# ==============================
+# Plot results for each feature separately
+# ==============================
 
 variables = ['Open', 'High', 'Low', 'Turnover']
 
 for i, variable in enumerate(variables):
-    plt.figure(figsize=(15, 3))
+    plt.figure(figsize=(15, 3))  # Create a new figure for each variable
+
+    # Plot actual prices (from test data)
     plt.plot(data.index[n + n_input:], test_data_original[:, i], label=f'Actual {variable}', color='blue')
+
+    # Plot predicted prices (from model)
     plt.plot(data.index[n + n_input:], predictions_original[:, i], label=f'Predicted {variable}', color='red')
+
+    # Add labels and title
     plt.title(f'{variable} Stock Price Prediction using RNN')
     plt.xlabel('Date')
-    plt.ylabel(f'{variable} Value')
+    plt.ylabel(f'{variable} Stock Price')
     plt.legend()
     plt.show()
 ```
