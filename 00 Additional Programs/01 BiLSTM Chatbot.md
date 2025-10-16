@@ -120,7 +120,7 @@ import nltk
 nltk.download('punkt_tab')
 nltk.download('punkt')
 
-print("✅ PyTorch installed! Version:", torch.__version__)
+print("PyTorch installed! Version:", torch.__version__)
 
 # ===============================================
 # Step 1: Define training pairs (simple chatbot dataset)
@@ -247,6 +247,29 @@ def chat(user_input):
             if idx.item() != 0:
                 words.append(word)
         return " ".join(words)
+
+# ============================================================================
+# 7. INTERACTIVE CHAT MODE
+# ============================================================================
+print("\n" + "="*70)
+print("INTERACTIVE CHAT MODE")
+print("="*70)
+print("Type a message to chat with the bot (type 'quit' to exit)")
+
+while True:
+    user_input = input("\nYou: ")
+    if user_input.lower() in ['quit', 'exit', 'bye']:
+        print("Bot: Goodbye!")
+        break
+
+    try:
+        response = chat(user_input)
+        print(f"Bot: {response}")
+    except Exception as e:
+        print(f" Error: {e}")
+
+print("\nChat session ended.")
+print("="*70)
 ```
 
 ---
@@ -254,7 +277,7 @@ def chat(user_input):
 ## 🔹 **Output**
 
 ```
-✅ PyTorch installed! Version: 2.9.0+cpu
+PyTorch installed! Version: 2.9.0+cpu
 Epoch 0 - Loss: 3.5659
 Epoch 10 - Loss: 0.3202
 Epoch 20 - Loss: 0.0199
