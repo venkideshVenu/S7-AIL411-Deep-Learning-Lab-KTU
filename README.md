@@ -26,6 +26,8 @@ Each experiment is organized into its own directory, containing:
 
 ```
 📦 AIL411-Deep-Learning-Lab-KTU
+├── 📁 00 Additional Programs/                       # Extra experiments and advanced implementations
+│   └── 01 BiLSTM Chatbot.ipynb/.md
 ├── 📁 00 Inputs/                                    # Input data files
 │   ├── clock.png
 │   └── data.csv
@@ -50,8 +52,10 @@ Each experiment is organized into its own directory, containing:
 ├── 📋 05 Digit Classification using CNN.ipynb/.md   # Computer Vision
 ├── 📋 06 Digit Classification using VGGnet-19.ipynb/.md
 ├── 📋 07 Review Classification IMDB.ipynb/.md       # NLP & RNN
-├── � 08 LSTM vs GRU Performance Analysis.ipynb/.md # Advanced RNN
-├── �📄 Syllabus.pdf                                 # Course syllabus
+├── 📋 08 LSTM vs GRU Performance Analysis.ipynb/.md # Advanced RNN
+├── 📋 09 NIFTY-50 Time Series Forecasting.ipynb/.md # Time Series Analysis
+├── 📋 10 English–Hindi Translation Using Shallow Autoencoder–Decoder.ipynb/.md # Machine Translation
+├── 📄 Syllabus.pdf                                 # Course syllabus
 └── 📄 README.md                                    # This file
 ```
 
@@ -59,23 +63,31 @@ Each experiment is organized into its own directory, containing:
 
 Here is a list of the mandatory experiments completed as part of this lab:
 
-| Exp. No. | Experiment Title                                                                                         | Status             | Notebook                                                                                        | Documentation                                                                            |
-| -------- | -------------------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| **1.1**  | Program to implement Linear Regression                                                                   | ✅ **Completed**   | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/1_Linear_Regression.ipynb)        | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/1_Linear_Regression.md)        |
-| **1.2**  | Image Enhancement Techniques                                                                             | ✅ **Completed**   | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/2%20Image%20Enhancement.ipynb)    | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/2%20Image%20Enhancement.md)    |
-| **1.3**  | Implement Y = X Neural Network                                                                           | ✅ **Completed**   | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/3%20Implement%20Y%20=%20X.ipynb)  | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/3%20Implement%20Y%20=%20X.md)  |
-| **1.4**  | Implement AND GATE with Neural Network                                                                   | ✅ **Completed**   | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/4%20Implement%20AND%20GATE.ipynb) | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/4%20Implement%20AND%20GATE.md) |
-| **2**    | Data pre-processing operations such as outliers and/or inconsistent data value management                | ✅ **Completed**   | [📓 Notebook](./02%20Outlier%20Management.ipynb)                                                | [📄 Docs](./02%20Outlier%20Management.md)                                                |
-| **3**    | Implement Feed forward neural network with three hidden layers for classification on CIFAR-10 dataset    | ✅ **Completed**   | [📓 Notebook](./03%20FeedForwardNetwork.ipynb)                                                  | [📄 Docs](./03%20FeedForwardNetwork.md)                                                  |
-| **4**    | Analyse the impact of optimization and weight initialization techniques (Xavier, Kaiming, Dropout, etc.) | ✅ **Completed**   | [📓 Notebook](./04%20Optimization%20and%20Weight%20Initialization%20Techniques.ipynb)           | [📄 Docs](./04%20Optimization%20and%20Weight%20Initialization%20Techniques.md)           |
-| **5**    | Digit classification using CNN architecture for MNIST dataset                                            | ✅ **Completed**   | [📓 Notebook](./05%20Digit%20Classification%20using%20CNN.ipynb)                                | [📄 Docs](./05%20Digit%20Classification%20using%20CNN.md)                                |
-| **6**    | Digit classification using pre-trained networks like VGGnet-19 for MNIST dataset                         | ✅ **Completed**   | [📓 Notebook](./06%20Digit%20Classification%20using%20VGGnet-19.ipynb)                          | [📄 Docs](./06%20Digit%20Classification%20using%20VGGnet-19.md)                          |
-| **7**    | Implement a simple RNN for review classification using IMDB dataset                                      | ✅ **Completed**   | [📓 Notebook](./07%20Review%20Classification%20IMDB.ipynb)                                      | [📄 Docs](./07%20Review%20Classification%20IMDB.md)                                      |
-| **8**    | Analyse and visualize the performance change while using LSTM and GRU instead of simple RNN              | ✅ **Completed**   | [📓 Notebook](./08%20LSTM%20vs%20GRU%20Performance%20Analysis.ipynb)                            | [📄 Docs](./08%20LSTM%20vs%20GRU%20Performance%20Analysis.md)                            |
-| **9**    | Implement time series forecasting prediction for NIFTY-50 dataset                                        | 🔄 **In Progress** | -                                                                                               | -                                                                                        |
-| **10**   | Implement a shallow auto encoder and decoder network for machine translation                             | 🔄 **In Progress** | -                                                                                               | -                                                                                        |
+| Exp. No. | Experiment Title                                                                                         | Status           | Notebook                                                                                        | Documentation                                                                            |
+| -------- | -------------------------------------------------------------------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **1.1**  | Program to implement Linear Regression                                                                   | ✅ **Completed** | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/1_Linear_Regression.ipynb)        | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/1_Linear_Regression.md)        |
+| **1.2**  | Image Enhancement Techniques                                                                             | ✅ **Completed** | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/2%20Image%20Enhancement.ipynb)    | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/2%20Image%20Enhancement.md)    |
+| **1.3**  | Implement Y = X Neural Network                                                                           | ✅ **Completed** | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/3%20Implement%20Y%20=%20X.ipynb)  | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/3%20Implement%20Y%20=%20X.md)  |
+| **1.4**  | Implement AND GATE with Neural Network                                                                   | ✅ **Completed** | [📓 Notebook](./01%20Familiarization%20of%20Python%20Packages/4%20Implement%20AND%20GATE.ipynb) | [📄 Docs](./01%20Familiarization%20of%20Python%20Packages/4%20Implement%20AND%20GATE.md) |
+| **2**    | Data pre-processing operations such as outliers and/or inconsistent data value management                | ✅ **Completed** | [📓 Notebook](./02%20Outlier%20Management.ipynb)                                                | [📄 Docs](./02%20Outlier%20Management.md)                                                |
+| **3**    | Implement Feed forward neural network with three hidden layers for classification on CIFAR-10 dataset    | ✅ **Completed** | [📓 Notebook](./03%20FeedForwardNetwork.ipynb)                                                  | [📄 Docs](./03%20FeedForwardNetwork.md)                                                  |
+| **4**    | Analyse the impact of optimization and weight initialization techniques (Xavier, Kaiming, Dropout, etc.) | ✅ **Completed** | [📓 Notebook](./04%20Optimization%20and%20Weight%20Initialization%20Techniques.ipynb)           | [📄 Docs](./04%20Optimization%20and%20Weight%20Initialization%20Techniques.md)           |
+| **5**    | Digit classification using CNN architecture for MNIST dataset                                            | ✅ **Completed** | [📓 Notebook](./05%20Digit%20Classification%20using%20CNN.ipynb)                                | [📄 Docs](./05%20Digit%20Classification%20using%20CNN.md)                                |
+| **6**    | Digit classification using pre-trained networks like VGGnet-19 for MNIST dataset                         | ✅ **Completed** | [📓 Notebook](./06%20Digit%20Classification%20using%20VGGnet-19.ipynb)                          | [📄 Docs](./06%20Digit%20Classification%20using%20VGGnet-19.md)                          |
+| **7**    | Implement a simple RNN for review classification using IMDB dataset                                      | ✅ **Completed** | [📓 Notebook](./07%20Review%20Classification%20IMDB.ipynb)                                      | [📄 Docs](./07%20Review%20Classification%20IMDB.md)                                      |
+| **8**    | Analyse and visualize the performance change while using LSTM and GRU instead of simple RNN              | ✅ **Completed** | [📓 Notebook](./08%20LSTM%20vs%20GRU%20Performance%20Analysis.ipynb)                            | [📄 Docs](./08%20LSTM%20vs%20GRU%20Performance%20Analysis.md)                            |
+| **9**    | Implement time series forecasting prediction for NIFTY-50 dataset                                        | ✅ **Completed** | [📓 Notebook](./09%20NIFTY-50%20Time%20Series%20Forecasting.ipynb)                              | [📄 Docs](./09%20NIFTY-50%20Time%20Series%20Forecasting.md)                              |
+| **10**   | Implement a shallow auto encoder and decoder network for machine translation                             | ✅ **Completed** | [📓 Notebook](./10%20English–Hindi%20Translation%20Using%20Shallow%20Autoencoder–Decoder.ipynb) | [📄 Docs](./10%20English–Hindi%20Translation%20Using%20Shallow%20Autoencoder–Decoder.md) |
 
-> **Note:** This README will be updated as the remaining experiments are completed.
+## Additional Experiments
+
+Beyond the mandatory curriculum, this repository also includes advanced implementations and explorations:
+
+| Exp. No. | Experiment Title                                   | Status           | Notebook                                                                | Documentation                                                    |
+| -------- | -------------------------------------------------- | ---------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **A.1**  | BiLSTM-based Conversational Chatbot Implementation | ✅ **Completed** | [📓 Notebook](./00%20Additional%20Programs/01%20BiLSTM%20Chatbot.ipynb) | [📄 Docs](./00%20Additional%20Programs/01%20BiLSTM%20Chatbot.md) |
+
+> **Note:** This README will be updated as more additional experiments are added.
 
 ## Experiment Details
 
@@ -103,12 +115,18 @@ Here is a list of the mandatory experiments completed as part of this lab:
 ### 📝 Natural Language Processing
 
 - **RNN for Sentiment Analysis:** Simple RNN implementation for IMDB movie review classification
-- **Advanced RNN architectures:** LSTM and GRU comparison (upcoming)
+- **Advanced RNN architectures:** LSTM and GRU comparison for performance analysis
+- **Machine Translation:** English-Hindi translation using shallow autoencoder-decoder networks
 
 ### 📈 Time Series & Advanced Applications
 
-- **Time Series Forecasting:** NIFTY-50 stock prediction (upcoming)
-- **Autoencoders:** Machine translation implementation (upcoming)
+- **Time Series Forecasting:** NIFTY-50 stock prediction using deep learning models
+- **Sequence Modeling:** Advanced RNN architectures for temporal data analysis
+
+### 🤖 Additional Advanced Implementations
+
+- **Conversational AI:** BiLSTM-based chatbot for natural language conversation
+- **Advanced NLP:** Cutting-edge deep learning applications beyond the core curriculum
 
 ## Getting Started
 
@@ -269,13 +287,19 @@ Through these experiments, you will gain practical experience in:
 - **CIFAR-10 FFNN:** ~45-50% accuracy (3 hidden layers)
 - **MNIST CNN:** ~98-99% accuracy (custom architecture)
 - **MNIST VGGNet-19:** ~99%+ accuracy (transfer learning)
-- **IMDB RNN:** ~85-88% accuracy (sentiment classification)
+- **IMDB RNN:** ~73-74% accuracy (sentiment classification)
+- **LSTM vs GRU:** Comparative analysis showing improved performance over simple RNN
+- **NIFTY-50 Forecasting:** Time series prediction with deep learning models
+- **English-Hindi Translation:** Autoencoder-decoder based machine translation
+- **BiLSTM Chatbot:** Advanced conversational AI implementation
 
 ### Optimization Results
 
 - **Xavier vs. Kaiming:** Demonstrated initialization impact on convergence
+- **L2 Regularization:** Achieved 50.38% accuracy (best performance in optimization study)
 - **Dropout effectiveness:** Reduced overfitting in deep networks
 - **Batch Normalization:** Accelerated training and improved stability
+- **Advanced RNN Architectures:** LSTM and GRU showing superior performance over simple RNN
 
 ## Reference Books
 
@@ -310,4 +334,4 @@ For questions or clarifications regarding the experiments:
 
 **Happy Learning! 🚀**
 
-_Last Updated: January 2025_
+_Last Updated: October 2025_
