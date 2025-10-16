@@ -77,30 +77,30 @@ from keras.utils import to_categorical
 import matplotlib.pyplot as plt
 
 # ----------------------------- Load and Explore Dataset -----------------------------
-(X_train, y_train), (X_test, y_test) = mnist.load_data()
-print(f'Original X_train shape: {X_train.shape}')
+(xtr, ytr), (xte, yte) = mnist.load_data()
+print(f'Original X_train shape: {xtr.shape}')  # (60000, 28, 28)
 
 # ----------------------------- Resize and Preprocess Images -----------------------------
 # Resize to 32x32 and convert grayscale (1 channel) to RGB (3 channels)
-X_train = np.repeat(tf.image.resize(X_train[..., np.newaxis], (32, 32)).numpy(), 3, axis=-1)
-X_test = np.repeat(tf.image.resize(X_test[..., np.newaxis], (32, 32)).numpy(), 3, axis=-1)
-print(f'Processed X_train shape: {X_train.shape}')
+xtr = np.repeat(tf.image.resize(xtr[..., np.newaxis], (32, 32)).numpy(), 3, axis=-1)
+xte = np.repeat(tf.image.resize(xte[..., np.newaxis], (32, 32)).numpy(), 3, axis=-1)
+print(f'Processed X_train[0] shape: {xtr[0].shape}')  # (32, 32, 3)
 
 # Normalize pixel values to [0, 1]
-X_train = X_train.astype('float32') / 255.0
-X_test = X_test.astype('float32') / 255.0
+xtr = xtr.astype('float32') / 255.0
+xte = xte.astype('float32') / 255.0
 
 # ----------------------------- One-Hot Encode Labels -----------------------------
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+ytr = to_categorical(ytr)
+yte = to_categorical(yte)
 
 # ----------------------------- Load Pre-trained VGG19 Model -----------------------------
 base_model = VGG19(
-    include_top=False,      # Exclude final classification layers
-    weights='imagenet',       # Use pre-trained ImageNet weights
-    input_shape=(32, 32, 3) # Input shape compatible with resized MNIST
+    include_top=False,         # Exclude final classification layers
+    weights='imagenet',        # Use pre-trained ImageNet weights
+    input_shape=(32, 32, 3)    # Input shape compatible with resized MNIST
 )
-base_model.trainable = False  # Freeze base model layers
+base_model.trainable = False   # Freeze base model layers
 
 # ----------------------------- Build the Full Model -----------------------------
 model = models.Sequential([
@@ -119,27 +119,28 @@ model.compile(
 
 # ----------------------------- Train the Model -----------------------------
 history = model.fit(
-    X_train, y_train,
+    xtr, ytr,
     epochs=5,
     batch_size=64,
     validation_split=0.2
 )
 
-# ----------------------------- Model Summary and Evaluation -----------------------------
+# ----------------------------- Model Summary -----------------------------
 model.summary()
-score = model.evaluate(X_test, y_test)
-print(f'\nTest Accuracy: {score[1]:.4f}')
+
+# ----------------------------- Evaluate on Test Data -----------------------------
+score = model.evaluate(xte, yte)
+print(f'Test Accuracy: {score[1]:.4f}')
 
 # ----------------------------- Plot Training History -----------------------------
-plt.figure(figsize=(8, 6))
 plt.plot(history.history['accuracy'], label='Training Accuracy')
 plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.title('VGG19 Transfer Learning on MNIST')
 plt.legend()
-plt.grid(True)
 plt.show()
+
 
 ```
 

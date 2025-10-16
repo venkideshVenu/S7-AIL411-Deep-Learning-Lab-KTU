@@ -1,8 +1,4 @@
-Of course\! Here is the detailed markdown file for your experiment on classifying the MNIST dataset using a Convolutional Neural Network.
-
------
-
-# **Experiment 7: Digit Classification using a Convolutional Neural Network (CNN)**
+# **Experiment 5: Digit Classification using a Convolutional Neural Network (CNN)**
 
 ### **Aim**
 
@@ -73,8 +69,7 @@ A CNN is a specialized type of neural network designed for processing grid-like 
 
 ```python
 # ----------------------------- Import Libraries -----------------------------
-import tensorflow as tf
-import numpy as np
+
 from keras import layers, models
 from keras.datasets import mnist
 from keras.utils import to_categorical
@@ -83,18 +78,18 @@ import matplotlib.pyplot as plt
 # ----------------------------- Load and Explore Data -----------------------------
 
 # Load the MNIST dataset (60,000 training and 10,000 test samples)
-(X_train, y_train), (X_test, y_test) = mnist.load_data()
+(xtr, ytr), (xte, yte) = mnist.load_data()
 
 # Print the shapes of the datasets
-print("X_train shape:", X_train.shape)
-print("y_train shape:", y_train.shape)
+print("X_train shape:", xtr.shape)
+print("y_train shape:", ytr.shape)
 
 # ----------------------------- Visualize Sample Digits -----------------------------
 plt.figure(figsize=(10, 10))
 for i in range(9):
     plt.subplot(3, 3, i + 1)
-    plt.imshow(X_train[i], cmap='gray')  # Display grayscale image
-    plt.title(f"Label: {y_train[i]}")
+    plt.imshow(xtr[i], cmap='gray')  # Display grayscale image
+    plt.title(f"Label: {ytr[i]}")
     plt.xticks([])
     plt.yticks([])
 plt.show()
@@ -102,12 +97,12 @@ plt.show()
 # ----------------------------- Preprocessing -----------------------------
 
 # Reshape input data to fit the CNN input (28x28x1) and normalize
-X_train = X_train.reshape((60000, 28, 28, 1)).astype('float32') / 255.0
-X_test = X_test.reshape((10000, 28, 28, 1)).astype('float32') / 255.0
+xtr = xtr.reshape((60000, 28, 28, 1)).astype('float32') / 255.0
+xte = xte.reshape((10000, 28, 28, 1)).astype('float32') / 255.0
 
 # One-hot encode labels (10 classes: 0–9)
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+ytr = to_categorical(ytr)
+yte = to_categorical(yte)
 
 # ----------------------------- Build CNN Model -----------------------------
 model = models.Sequential([
@@ -137,13 +132,13 @@ model.compile(optimizer='adam',
 print(model.summary())
 
 # ----------------------------- Train the Model -----------------------------
-history = model.fit(X_train, y_train,
+history = model.fit(xtr, ytr,
                     epochs=15,
                     batch_size=64,
                     validation_split=0.2)  # 20% data used for validation
 
 # ----------------------------- Evaluate on Test Set -----------------------------
-test_loss, test_acc = model.evaluate(X_test, y_test)
+test_loss, test_acc = model.evaluate(xte, yte)
 print(f'Test accuracy: {test_acc:.4f}')
 
 # ----------------------------- Plot Accuracy -----------------------------

@@ -91,27 +91,23 @@ The goal of smart initialization is to set the initial weights of the network in
 
 ```python
 # ----------------------------------- Imports -----------------------------------
-import tensorflow as tf
-from tensorflow.keras import layers, models, optimizers, regularizers
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.utils import to_categorical
+from keras import layers, models, optimizers, regularizers
+from keras.datasets import cifar10
+from keras.utils import to_categorical
 import matplotlib.pyplot as plt
 
-# Ensure eager execution
-tf.config.run_functions_eagerly(True)
-
 # ----------------------------------- Data Loading -----------------------------------
-(X_train, y_train), (X_test, y_test) = cifar10.load_data()
+(xtr, ytr), (xte, yte) = cifar10.load_data()
 
 # Normalize pixel values [0,1]
-X_train = X_train.astype('float32') / 255.0
-X_test = X_test.astype('float32') / 255.0
+xtr = xtr.astype('float32') / 255.0
+xte = xte.astype('float32') / 255.0
 
 # One-hot encode labels
-y_train = to_categorical(y_train, 10)
-y_test = to_categorical(y_test, 10)
+ytr = to_categorical(ytr, 10)
+yte = to_categorical(yte, 10)
 
-print("Training shape:", X_train.shape)
+print("Training shape:", xtr.shape)
 
 # ----------------------------------- Models -----------------------------------
 
@@ -200,8 +196,8 @@ model7 = models.Sequential([
 def compile_and_train(model, optimizer, name, batch_size=32, epochs=15):
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
     print(model.summary())
-    history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_split=0.2)
-    score = model.evaluate(X_test, y_test, batch_size=batch_size)
+    history = model.fit(xtr, ytr, epochs=epochs, batch_size=batch_size, validation_split=0.2)
+    score = model.evaluate(xte, yte, batch_size=batch_size)
     print(f"{name} Score:", score)
     return history
 
@@ -226,6 +222,7 @@ plt.title("Model Validation Accuracy Comparison")
 plt.legend()
 plt.grid(True)
 plt.show()
+
 ```
 
 ---

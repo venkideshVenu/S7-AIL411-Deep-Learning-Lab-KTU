@@ -76,32 +76,31 @@ This is the standard loss function for binary (two-class) classification problem
 
 ```python
 # ----------------------------- Import Libraries -----------------------------
-from keras.datasets import imdb
-import tensorflow as tf
-from keras import layers, models, Sequential
-from keras.preprocessing import sequence
 import numpy as np
+from keras.datasets import imdb
+from keras import layers, models
+from keras.preprocessing import sequence
 
 # ----------------------------- Set Hyperparameters -----------------------------
 max_features = 5000         # Vocabulary size
 max_words = 500             # Max sequence length after padding
 
 # ----------------------------- Load and Preprocess the Dataset -----------------------------
-(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=max_features)
-print(f'{len(X_train)} train sequences\n{len(X_test)} test sequences')
+(xtr, ytr), (xte, yte) = imdb.load_data(num_words=max_features)
+print(f'{len(xtr)} train sequences\n{len(xte)} test sequences')
 
 # ----------------------------- Pad Sequences -----------------------------
-X_train = sequence.pad_sequences(X_train, maxlen=max_words)
-X_test = sequence.pad_sequences(X_test, maxlen=max_words)
-print('Train data shape:', X_train.shape)
-print('Test data shape:', X_test.shape)
+xtr = sequence.pad_sequences(xtr, maxlen=max_words)
+xte = sequence.pad_sequences(xte, maxlen=max_words)
+print('Train data shape:', xtr.shape)
+print('Test data shape:', xte.shape)
 
 # ----------------------------- Build the Model -----------------------------
-model = models.Sequential()
-model.add(layers.Embedding(max_features, 32))
-model.add(layers.SimpleRNN(100))
-model.add(layers.Dense(1, activation='sigmoid'))
-model.build(input_shape=(None, max_words))
+model = models.Sequential([
+    layers.Embedding(max_features, 32, input_length=max_words),
+    layers.SimpleRNN(100),
+    layers.Dense(1, activation='sigmoid')
+])
 model.summary()
 
 # ----------------------------- Compile the Model -----------------------------
@@ -110,17 +109,17 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 # ----------------------------- Train the Model -----------------------------
-history = model.fit(X_train, y_train,
+history = model.fit(xtr, ytr,
                     epochs=15,
                     batch_size=64,
                     validation_split=0.2)
 
 # ----------------------------- Evaluate the Model -----------------------------
-loss, acc = model.evaluate(X_test, y_test)
+loss, acc = model.evaluate(xte, yte)
 print("Test accuracy:", round(acc*100, 4))
 
 # ----------------------------- Prediction Example -----------------------------
-test_seq = np.reshape(X_test[7], (1, -1))   # Use X_test instead of undefined 'xte'
+test_seq = np.reshape(xte[7], (1, -1))   
 pred = model.predict(test_seq)[0][0]        # Prediction value
 
 if pred >= 0.5:
@@ -128,7 +127,8 @@ if pred >= 0.5:
 else:
     print("Negative Review")
 
-print("Actual Label:", "Positive" if y_test[7] == 1 else "Negative")
+print("Actual Label:", "Positive" if yte[7] == 1 else "Negative")
+
 ```
 
 ---

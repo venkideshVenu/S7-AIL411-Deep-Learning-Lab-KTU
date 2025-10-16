@@ -71,44 +71,36 @@ To compare and analyze the performance of **LSTM (Long Short-Term Memory)** and 
 ```python
 # Experiment 08: Analyze and Visualize the Performance of LSTM vs GRU
 
+from keras import models, layers
 from keras.datasets import imdb
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Sequential
-from keras.layers import Embedding, LSTM, Dense, GRU
+from keras.preprocessing import sequence
 import matplotlib.pyplot as plt
 
 # ----------------------------- Hyperparameters -----------------------------
-num_words = 10000      # Use the top 10,000 most frequent words
-max_length = 200       # Each review is padded/truncated to 200 words
+num_words = 10000
+max_length = 200
 
 # ----------------------------- Load & Preprocess Data -----------------------------
 (xtr, ytr), (xte, yte) = imdb.load_data(num_words=num_words)
-
-# Pad sequences to fixed length
-xtr, xte = pad_sequences(xtr, maxlen=max_length), pad_sequences(xte, maxlen=max_length)
+xtr, xte = sequence.pad_sequences(xtr, maxlen=max_length), sequence.pad_sequences(xte, maxlen=max_length)
 
 # ----------------------------- LSTM Model -----------------------------
-l_model = Sequential([
-    Embedding(input_dim=num_words, output_dim=128, input_length=max_length),  # Word embedding
-    LSTM(128),                                                                # LSTM layer
-    Dense(1, activation='sigmoid')                                            # Output layer for binary classification
+l_model = models.Sequential([
+    layers.Embedding(input_dim=num_words, output_dim=128, input_length=max_length),
+    layers.LSTM(128),
+    layers.Dense(1, activation='sigmoid')
 ])
 
-# Compile LSTM model
 l_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-
-# Train LSTM model
 l_history = l_model.fit(xtr, ytr, validation_split=0.2, epochs=5, batch_size=64)
-
-# Evaluate on test set
 loss, acc = l_model.evaluate(xte, yte)
 print("LSTM Test accuracy:", round(acc*100, 4))
 
 # ----------------------------- GRU Model -----------------------------
-g_model = Sequential([
-    Embedding(input_dim=num_words, output_dim=128, input_length=max_length),  # Word embedding
-    GRU(128),                                                                 # GRU layer
-    Dense(1, activation='sigmoid')                                            # Output layer
+g_model = models.Sequential([
+    layers.Embedding(input_dim=num_words, output_dim=128, input_length=max_length),
+    layers.GRU(128),
+    layers.Dense(1, activation='sigmoid')
 ])
 
 # Compile GRU model
